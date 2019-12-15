@@ -12,17 +12,15 @@ namespace Eticaret.MvcWebUI.Controllers
     {
         private DataContext db = new DataContext();
         public ActionResult Index()
-        {
-           
+        { 
             return View(GetCart());
         }
-
         public ActionResult AddToCart(int Id)
         {
             var product = db.Products.FirstOrDefault(i => i.Id == Id);
-            if (product!=null)
+            if (product != null)
             {
-                GetCart().AddProduct(product,1);
+                GetCart().AddProduct(product, 1);
             }
             return RedirectToAction("Index");
         }
@@ -40,17 +38,75 @@ namespace Eticaret.MvcWebUI.Controllers
         public Cart GetCart()
         {
             Cart cart = (Cart)Session["Cart"];
-            if (cart==null)
+            if (cart == null)
             {
                 cart = new Cart();
                 Session["Cart"] = cart;
             }
             return cart;
-        } 
+        }
 
         public PartialViewResult Summary()
         {
             return PartialView(GetCart());
+        }
+
+        public ActionResult Checkout()
+        {
+            return View(new ShippingDetails());
+        }
+
+        [HttpPost]
+        public ActionResult Checkout(ShippingDetails shippingDetails)
+        {
+            var cart = GetCart();
+
+            if (cart.CartLines.Count() == 0)
+            {
+                ModelState.AddModelError("UrunYokError", "Sepetinizde ürün bulunmamaktadır.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var order = new Order()
+                {
+                    OrderNumber = "A" + (new Random()).Next(111111, 999999).ToString(),
+                    Total = cart.Total(),
+                    OrderDate = DateTime.Now,
+                    OrderState=EnumOrderState.Waiting,//-->
+                    UserName=User.Identity.Name,
+
+                    AdresBasligi=shippingDetails.AdresBasligi,
+                    Sehir=shippingDetails.Sehir,
+                    Semt = shippingDetails.Semt,
+                    Mahalle = shippingDetails.Mahalle,
+                    PostaKodu = shippingDetails.PostaKodu
+                };
+                order.OrderLine = new List<OrderLine>();
+
+                foreach (var item in cart.CartLines)
+                {
+                    var orderLine = new OrderLine()
+                    {
+                        Quantity = item.Quantity,
+                        Price=item.Quantity*item.Product.Price,
+                        ProductId=item.Product.Id
+                        
+                    };
+                    order.OrderLine.Add(orderLine);
+                }
+
+                db.Orders.Add(order);
+                db.SaveChanges();
+
+                //cart sıfırladık
+                cart.Clear();
+                return View("Completed");
+            }
+            else
+            {
+                return View(shippingDetails);
+            }
         }
     }
 }

@@ -8,6 +8,7 @@
 <div class="container pb-5 pt-5">
     <h2>Kullanıcı Girişi</h2>
     <hr />
+
     @using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
@@ -32,13 +33,13 @@
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
                     <input type="submit" value="Giriş" class="btn btn-primary" />
-
                 </div>
             </div>
         </div>
     }
 
-    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
-    <script src="~/Scripts/jquery.validate.min.js"></script>
-    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 </div>
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

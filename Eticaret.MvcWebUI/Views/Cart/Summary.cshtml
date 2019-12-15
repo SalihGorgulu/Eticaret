@@ -7,7 +7,9 @@
 
 <ul class="navbar-nav my-2 my-lg-0" >
     <li id="cart" class="nav-item active"> 
-        <i class="fas fa-shopping-cart"></i>
-        (@Model.CartLines.Count())
+        <a class="nav-link" href="/Cart">
+            <i class="fas fa-shopping-cart"></i>
+            (@Model.CartLines.Count())
+        </a>
     </li>
 </ul>
